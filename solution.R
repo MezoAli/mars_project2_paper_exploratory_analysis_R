@@ -35,4 +35,20 @@ tb2 <- data %>%
   bold_p()
 tb2
 
+plot_barplot_fn <- function(var){
+  require(tidyverse)
+  var <- rlang::enquo(var)
+  ggplot(data,aes(x = !!var,fill = !!var)) +
+    geom_bar() +
+    theme(axis.text.x = element_text(angle = 45))
+}
+
+
+plot_barplot_fn(race)
+plot_barplot_fn(professional_category)
+plot_barplot_fn(age_in_years)
+
+
+
+
 
