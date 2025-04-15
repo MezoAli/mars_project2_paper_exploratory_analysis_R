@@ -23,7 +23,7 @@ tb1 <- data %>%
   select(1:12) %>% 
   tbl_summary() %>% 
   bold_labels() %>% 
-  modify_caption("Demographic Data")
-
-
+  modify_caption("**Demographic Data**")
 tb1
+
+
