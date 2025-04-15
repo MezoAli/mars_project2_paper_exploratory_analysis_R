@@ -26,4 +26,13 @@ tb1 <- data %>%
   modify_caption("**Demographic Data**")
 tb1
 
+tb2 <- data %>% 
+  select(1:12) %>% 
+  tbl_summary(by = professional_category) %>% 
+  bold_labels() %>% 
+  modify_caption("**Table 1. Participants' Characteristics By Profession (n = 50)**") %>% 
+  add_p() %>% 
+  bold_p()
+tb2
+
 
