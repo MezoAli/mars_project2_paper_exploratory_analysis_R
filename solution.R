@@ -40,14 +40,16 @@ plot_barplot_fn <- function(var){
   var <- rlang::enquo(var)
   ggplot(data,aes(x = !!var,fill = !!var)) +
     geom_bar() +
-    theme(axis.text.x = element_text(angle = 45))
+    theme(axis.text.x = element_text(angle = 90,margin = margin(t=5),size = 8),
+          plot.title = element_text(face = "bold",hjust = .5)) +
+    ggtitle(paste("Participants",rlang::as_label(var),sep = " "))
 }
 
 
 plot_barplot_fn(race)
 plot_barplot_fn(professional_category)
 plot_barplot_fn(age_in_years)
-
+plot_barplot_fn(working_unit_category)
 
 
 
