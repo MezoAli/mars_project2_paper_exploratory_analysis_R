@@ -31,6 +31,14 @@ cor.matrix.plot <- corrplot(cor.matrix,method = "square", type = "lower", tl.cex
 which(abs(cor.matrix) > 0.7 & abs(cor.matrix) < 1, arr.ind = TRUE)
 
 
+
+KMO(data_numeric)
+
+cortest.bartlett(data_numeric)
+
+
+
+
 tb1 <- data %>% 
   select(1:12) %>% 
   tbl_summary() %>% 
@@ -46,6 +54,11 @@ tb2 <- data %>%
   add_p() %>% 
   bold_p()
 tb2
+
+
+
+
+
 
 plot_barplot_fn <- function(var){
   require(tidyverse)
