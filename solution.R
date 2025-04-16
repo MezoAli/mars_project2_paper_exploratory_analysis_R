@@ -6,17 +6,29 @@ library(psych)
 library(janitor)
 library(gtsummary)
 library(cardx)
+library(corrplot)
 
 data<- read_csv("./data.csv") %>% 
   clean_names(.)
 
 data <- data %>% 
   mutate(service_in_years = as.numeric(service_in_years)) %>% 
-  replace_na(list(service_in_years = 0))
+  replace_na(list(service_in_years = 0)) %>% 
+  mutate(across(.cols = 13:44,.fn = as.factor))
 
+summary(data)
 
-data %>% 
-  gtsummary::tbl_summary()
+data_numeric <- data %>%
+  select(13:44) %>% 
+  mutate(across(everything(), ~ as.integer(as.factor(.))))
+
+names(data_numeric) <- paste0("Q",1:32)
+
+cor.matrix = cor(data_numeric,use = "pairwise.complete.obs")
+
+cor.matrix.plot <- corrplot(cor.matrix,method = "square", type = "lower", tl.cex = 0.6)
+
+which(abs(cor.matrix) > 0.7 & abs(cor.matrix) < 1, arr.ind = TRUE)
 
 
 tb1 <- data %>% 
