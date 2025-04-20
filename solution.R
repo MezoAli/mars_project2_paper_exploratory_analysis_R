@@ -78,4 +78,19 @@ plot_barplot_fn(working_unit_category)
 
 
 
+fa.results <- fa(data_numeric,nfactors = 2)
+fa.diagram(fa.results)
+
+# according to fa.results and fa.diagram, some questions need to be dropped due to
+# very low loadings ( less than 0.3) and/or very high uniqueness (near to 1)
+# and these questions are 8,13,14,16,19,22,25,27,28,31
+
+data_numeric_modified <- data_numeric %>% 
+  select(-c(8,13,14,16,19,22,25,27,28,31))
+
+fa.results_modified <- fa(data_numeric_modified,nfactors = 2)
+fa.diagram(fa.results_modified)
+
+respect.satisfaction.df <- data_numeric %>% 
+  select(1:7)
 
