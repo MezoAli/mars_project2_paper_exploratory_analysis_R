@@ -3,24 +3,24 @@ graphics.off()
 
 library(tidyverse)
 library(psych)
-library(janitor)
 library(gtsummary)
 library(cardx)
 library(corrplot)
 
-data<- read_csv("./data.csv") %>% 
-  clean_names(.)
+data<- read_csv("./data.csv")
+names(data)
 
 data <- data %>% 
-  mutate(service_in_years = as.numeric(service_in_years)) %>% 
-  replace_na(list(service_in_years = 0)) %>% 
-  mutate(across(.cols = 13:44,.fn = as.factor))
+  mutate(`Service  (in years)` = as.numeric(`Service  (in years)`)) %>% 
+  replace_na(list(`Service  (in years)` = 0)) %>% 
+  mutate(across(.cols = 13:44,.fn = as.factor)) %>% 
+  na.omit()
 
 summary(data)
 
 data_numeric <- data %>%
   select(13:44) %>% 
-  mutate(across(everything(), ~ as.integer(as.factor(.))))
+  mutate(across(everything(), as.integer))
 
 names(data_numeric) <- c("angry","frustrated","understood","respected","pleased","satisfied","equal","talking",
                          "correct","change_ttt","pat_saftey","pat_care","schedule","exch_info","tired","help",
@@ -55,7 +55,7 @@ tb2 <- data %>%
   select(1:12) %>% 
   tbl_summary(by = professional_category) %>% 
   bold_labels() %>% 
-  modify_caption("**Table 1. Participants' Characteristics By Profession (n = 50)**") %>% 
+  modify_caption("**Table 1. Participants' Characteristics By Profession (n = 37)**") %>% 
   add_p() %>% 
   bold_p()
 tb2
@@ -76,11 +76,11 @@ plot_barplot_fn <- function(var){
 }
 
 
-plot_barplot_fn(race)
-plot_barplot_fn(professional_category)
-plot_barplot_fn(age_in_years)
-plot_barplot_fn(working_unit_category)
-plot_barplot_fn(salary_category_in_aed)
+plot_barplot_fn(Race)
+plot_barplot_fn(`Professional category`)
+plot_barplot_fn(`Age in years`)
+plot_barplot_fn(`Working unit category`)
+plot_barplot_fn(`Salary category in AED`)
 
 
 
@@ -93,9 +93,10 @@ fa.diagram(fa.results)
 # the same questions according to instructor 
 
 
-respect.satisfaction.df <- data_numeric_modified %>% 
-  select(1:7) %>% 
-  mutate(across(everything(),~replace_na(.,0)))
+respect.satisfaction.df <- data_numeric %>% 
+  select(1:9)
+
+summary(respect.satisfaction.df)
 
 cron.alpha.respect <- alpha(respect.satisfaction.df,check.keys = T)
 
