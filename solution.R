@@ -100,3 +100,11 @@ summary(respect.satisfaction.df)
 
 cron.alpha.respect <- alpha(respect.satisfaction.df,check.keys = T)
 
+tab3 <- data %>% 
+  select(c(1,13:21)) %>% 
+  tbl_summary(by = `Professional category`) %>% 
+  bold_labels() %>% 
+  add_p() %>% 
+  bold_p()
+tab3
+
