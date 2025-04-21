@@ -138,3 +138,11 @@ tab5 <- data %>%
   add_p() %>% 
   bold_p()
 tab5
+
+tab6 <- data %>% 
+  select(22:30) %>% 
+  tbl_summary() %>% 
+  modify_header(label = "Openness & Sharing of information subscale item scpre (a = 0.38)") %>% 
+  modify_caption("**Table 3. Frequency of perceived Openness and Sharing of information items during nurse-physician communication among nurses and physicians (n = 37):**") %>%
+  bold_labels()
+tab6
