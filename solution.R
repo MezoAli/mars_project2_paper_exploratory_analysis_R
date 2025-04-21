@@ -109,9 +109,16 @@ tab3 <- data %>%
 tab3
 
 tab4 <- data %>% 
-  select(13:17) %>% 
+  select(13:21) %>% 
   tbl_summary() %>% 
   modify_header(label = "Respect and Satisfaction on communication subscale items (a = 0.51)") %>% 
   modify_caption("**Table 2. Frequency of perceived professional respect and satisfaction items during nurse-physician communication among nurses and physicians (n = 37):**") %>%
   bold_labels()
 tab4
+
+names(data)
+
+plot_barplot_fn(`Feeling not angry after nurse and physician interaction?`)
+plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`)
+plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
+plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
