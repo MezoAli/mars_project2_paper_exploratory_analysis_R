@@ -108,3 +108,10 @@ tab3 <- data %>%
   bold_p()
 tab3
 
+tab4 <- data %>% 
+  select(13:17) %>% 
+  tbl_summary() %>% 
+  modify_header(label = "Respect and Satisfaction on communication subscale items (a = 0.51)") %>% 
+  modify_caption("**Table 2. Frequency of perceived professional respect and satisfaction items during nurse-physician communication among nurses and physicians (n = 37):**") %>%
+  bold_labels()
+tab4
