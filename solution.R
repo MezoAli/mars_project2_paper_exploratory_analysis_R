@@ -22,7 +22,10 @@ data_numeric <- data %>%
   select(13:44) %>% 
   mutate(across(everything(), ~ as.integer(as.factor(.))))
 
-names(data_numeric) <- paste0("Q",1:32)
+names(data_numeric) <- c("angry","frustrated","understood","respected","pleased","satisfied","equal","talking",
+                         "correct","change_ttt","pat_saftey","pat_care","schedule","exch_info","tired","help",
+                         "listen","corr_info","non_compliance","Negligence","abuse","poor_att","uncooperative","gender_diff",
+                         "unfavor_att","poor_commun","disruptive","differential_ttt","absc_forum","shar_vision","malfunctioning","suppl_short")
 
 cor.matrix = cor(data_numeric,use = "pairwise.complete.obs")
 
@@ -32,7 +35,9 @@ which(abs(cor.matrix) > 0.7 & abs(cor.matrix) < 1, arr.ind = TRUE)
 
 
 
-KMO(data_numeric)
+KMO.result <- KMO(data_numeric)
+
+sort(KMO.result$MSAi,decreasing = TRUE)
 
 cortest.bartlett(data_numeric)
 
@@ -75,6 +80,7 @@ plot_barplot_fn(race)
 plot_barplot_fn(professional_category)
 plot_barplot_fn(age_in_years)
 plot_barplot_fn(working_unit_category)
+plot_barplot_fn(salary_category_in_aed)
 
 
 
@@ -83,14 +89,13 @@ fa.diagram(fa.results)
 
 # according to fa.results and fa.diagram, some questions need to be dropped due to
 # very low loadings ( less than 0.3) and/or very high uniqueness (near to 1)
-# and these questions are 8,13,14,16,19,22,25,27,28,31
+# and these questions are 8,13,14,16,19,22,25,27,28,31 but i will continue with
+# the same questions according to instructor 
 
-data_numeric_modified <- data_numeric %>% 
-  select(-c(8,13,14,16,19,22,25,27,28,31))
 
-fa.results_modified <- fa(data_numeric_modified,nfactors = 2)
-fa.diagram(fa.results_modified)
+respect.satisfaction.df <- data_numeric_modified %>% 
+  select(1:7) %>% 
+  mutate(across(everything(),~replace_na(.,0)))
 
-respect.satisfaction.df <- data_numeric %>% 
-  select(1:7)
+cron.alpha.respect <- alpha(respect.satisfaction.df,check.keys = T)
 
