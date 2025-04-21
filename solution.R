@@ -122,3 +122,19 @@ plot_barplot_fn(`Feeling not angry after nurse and physician interaction?`)
 plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`)
 plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
 plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
+
+
+openess.sharing.df <- data_numeric %>% 
+  select(10:18)
+
+summary(openess.sharing.df)
+
+cron.alpha.openess <- alpha(openess.sharing.df,check.keys = T)
+
+tab5 <- data %>% 
+  select(c(1,22:30)) %>% 
+  tbl_summary(by = `Professional category`) %>% 
+  bold_labels() %>% 
+  add_p() %>% 
+  bold_p()
+tab5
