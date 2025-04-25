@@ -104,7 +104,9 @@ plot_barplot_fn(`Salary category in AED`)
 
 fa.results <- fa(data_numeric,nfactors = 2)
 fa.diagram(fa.results)
-
+fa.results$e.values
+scree(data_numeric)
+fa.parallel(data_numeric, fa = "fa", n.iter = 100)
 # according to fa.results and fa.diagram, some questions need to be dropped due to
 # very low loadings ( less than 0.3) and/or very high uniqueness (near to 1)
 # and these questions are 8,13,14,16,19,22,25,27,28,31 but i will continue with
@@ -199,3 +201,23 @@ plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`
 plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
 plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
 
+
+respect_scores <- respect.satisfaction.df %>% 
+  mutate(total_score = rowSums(data_numeric[, 1:9], na.rm = TRUE))
+
+respect_scores %>% 
+  ggplot(.,aes(x = total_score)) +
+  geom_bar(width = 2,fill = "blue") +
+  scale_x_continuous(limits = c(32,44),
+                     breaks = seq(32,44,2))
+
+# Calculate mean and SD
+mean_score <- mean(respect_scores$total_score)
+sd_score <- sd(respect_scores$total_score)
+
+# Max possible score
+max_score <- 9 * 5  # 9 questions, max 5 points each = 45
+
+# Convert to percentage
+percent_mean <- (mean_score / max_score) * 100
+percent_sd <- (sd_score / max_score) * 100
