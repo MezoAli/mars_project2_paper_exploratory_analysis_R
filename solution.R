@@ -1,26 +1,46 @@
 rm(list = ls())
 graphics.off()
 
+install.packages("likert")
+
 library(tidyverse)
 library(psych)
 library(gtsummary)
 library(cardx)
 library(corrplot)
+library(likert)
 
 data<- read_csv("./data.csv")
 names(data)
 
+recode_scale <- function(x) {
+  case_when(
+    x == "always" ~ 5,
+    x == "usually" ~ 4,
+    x == "sometimes" ~ 3,
+    x == "rarely" ~ 2,
+    x == "never" ~ 1,
+    TRUE ~ NA # Handle missing/other values
+  )
+}
+
 data <- data %>% 
   mutate(`Service  (in years)` = as.numeric(`Service  (in years)`)) %>% 
-  replace_na(list(`Service  (in years)` = 0)) %>% 
+  replace_na(list(`Service  (in years)` = 0)) %>%
+  mutate(across(.cols = 13:44, tolower)) %>% 
+  mutate(across(.cols = c(40), ~case_when(. == "rarley" ~ "rarely",
+                                          T ~ .))) %>% 
   mutate(across(.cols = 13:44,.fn = as.factor)) %>% 
   na.omit()
 
 summary(data)
 
 data_numeric <- data %>%
-  select(13:44) %>% 
+  select(13:44) %>%
+  mutate(across(everything(), recode_scale)) %>%
   mutate(across(everything(), as.integer))
+
+
 
 names(data_numeric) <- c("angry","frustrated","understood","respected","pleased","satisfied","equal","talking",
                          "correct","change_ttt","pat_saftey","pat_care","schedule","exch_info","tired","help",
@@ -40,8 +60,6 @@ KMO.result <- KMO(data_numeric)
 sort(KMO.result$MSAi,decreasing = TRUE)
 
 cortest.bartlett(data_numeric)
-
-
 
 
 tb1 <- data %>% 
@@ -123,6 +141,20 @@ plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`
 plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
 plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
 
+data_long <- data %>%
+  pivot_longer(c(13:21), names_to = "Question", values_to = "Response") %>%
+  group_by(Question, Response) %>% 
+  tally() %>% 
+  group_by(Question) %>%
+  mutate(Percentage = round(n / sum(n) * 100,0))
+
+ggplot(data_long, aes(x = Question, y = n, fill = Response)) +
+  geom_col(position = "fill") +
+  coord_flip() +
+  labs(
+    title = "Nurse-Physician Interaction Survey Responses",
+    y = "Percentage of Responses" ) +
+  theme_minimal()
 
 openess.sharing.df <- data_numeric %>% 
   select(10:18)
@@ -146,3 +178,11 @@ tab6 <- data %>%
   modify_caption("**Table 3. Frequency of perceived Openness and Sharing of information items during nurse-physician communication among nurses and physicians (n = 37):**") %>%
   bold_labels()
 tab6
+
+
+names(data[,22:30])
+plot_barplot_fn(`In the event of a change in treatment plan, the nurse and the physicians have a mutual understanding`)
+plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`)
+plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
+plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
+
