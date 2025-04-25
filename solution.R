@@ -134,13 +134,6 @@ tab4 <- data %>%
   bold_labels()
 tab4
 
-names(data)
-
-plot_barplot_fn(`Feeling not angry after nurse and physician interaction?`)
-plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`)
-plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
-plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
-
 plot.subscale <- function(col1,col2,title){
   data_long <- data %>%
     pivot_longer(all_of(names(data)[col1:col2]), names_to = "Question", values_to = "Response") %>%
@@ -165,6 +158,15 @@ plot.subscale <- function(col1,col2,title){
 plot.subscale(13,21,"Respect and Satisfaction on Communication Subscale")
 
 
+
+names(data)
+
+plot_barplot_fn(`Feeling not angry after nurse and physician interaction?`)
+plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`)
+plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
+plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
+
+
 openess.sharing.df <- data_numeric %>% 
   select(10:18)
 
@@ -187,6 +189,8 @@ tab6 <- data %>%
   modify_caption("**Table 3. Frequency of perceived Openness and Sharing of information items during nurse-physician communication among nurses and physicians (n = 37):**") %>%
   bold_labels()
 tab6
+
+plot.subscale(22,30,"Openness and Sharing Patient Information on Communication Subscale")
 
 
 names(data[,22:30])
