@@ -141,25 +141,28 @@ plot_barplot_fn(`Feeling not frustrated after nurse and physician interaction ?`
 plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
 plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
 
-data_long <- data %>%
-  pivot_longer(c(13:21), names_to = "Question", values_to = "Response") %>%
-  group_by(Question, Response) %>% 
-  tally() %>% 
-  group_by(Question) %>%
-  mutate(Percentage = round(n / sum(n) * 100,0),
-         Proportion = n / sum(n))
+plot.subscale <- function(col1,col2,title){
+  data_long <- data %>%
+    pivot_longer(all_of(names(data)[col1:col2]), names_to = "Question", values_to = "Response") %>%
+    group_by(Question, Response) %>% 
+    tally() %>% 
+    group_by(Question) %>%
+    mutate(Percentage = round(n / sum(n) * 100,0),
+           Proportion = n / sum(n))
+  
+  ggplot(data_long, aes(x = Question, y = Proportion, fill = Response)) +
+    geom_col(position = "fill") +
+    geom_text(aes(label = paste0(Percentage, "%")),
+              position = position_stack(vjust = 0.5), size = 3, color = "white") +
+    coord_flip() +
+    labs(
+      title = title,
+      y = "Percentage" ) +
+    scale_y_continuous(labels = scales::percent) +
+    theme_minimal()
+}
 
-ggplot(data_long, aes(x = Question, y = Proportion, fill = Response)) +
-  geom_col(position = "fill") +
-  geom_text(aes(label = paste0(Percentage, "%")),
-            position = position_stack(vjust = 0.5), size = 3, color = "white") +
-  coord_flip() +
-  labs(
-    title = "Respect and Satisfaction on Communication Subscale",
-    y = "Percentage" ) +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
-
+plot.subscale(13,21,"Respect and Satisfaction on Communication Subscale")
 
 
 openess.sharing.df <- data_numeric %>% 
