@@ -146,15 +146,21 @@ data_long <- data %>%
   group_by(Question, Response) %>% 
   tally() %>% 
   group_by(Question) %>%
-  mutate(Percentage = round(n / sum(n) * 100,0))
+  mutate(Percentage = round(n / sum(n) * 100,0),
+         Proportion = n / sum(n))
 
-ggplot(data_long, aes(x = Question, y = n, fill = Response)) +
+ggplot(data_long, aes(x = Question, y = Proportion, fill = Response)) +
   geom_col(position = "fill") +
+  geom_text(aes(label = paste0(Percentage, "%")),
+            position = position_stack(vjust = 0.5), size = 3, color = "white") +
   coord_flip() +
   labs(
-    title = "Nurse-Physician Interaction Survey Responses",
-    y = "Percentage of Responses" ) +
+    title = "Respect and Satisfaction on Communication Subscale",
+    y = "Percentage" ) +
+  scale_y_continuous(labels = scales::percent) +
   theme_minimal()
+
+
 
 openess.sharing.df <- data_numeric %>% 
   select(10:18)
