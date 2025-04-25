@@ -203,7 +203,7 @@ plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
 
 
 respect_scores <- respect.satisfaction.df %>% 
-  mutate(total_score = rowSums(data_numeric[, 1:9], na.rm = TRUE))
+  mutate(total_score = rowSums(across(everything()), na.rm = TRUE))
 
 respect_scores %>% 
   ggplot(.,aes(x = total_score)) +
@@ -212,12 +212,32 @@ respect_scores %>%
                      breaks = seq(32,44,2))
 
 # Calculate mean and SD
-mean_score <- mean(respect_scores$total_score)
-sd_score <- sd(respect_scores$total_score)
+mean_respect_scores <- mean(respect_scores$total_score)
+sd_respect_scores <- sd(respect_scores$total_score)
 
 # Max possible score
 max_score <- 9 * 5  # 9 questions, max 5 points each = 45
 
 # Convert to percentage
-percent_mean <- (mean_score / max_score) * 100
-percent_sd <- (sd_score / max_score) * 100
+percent_mean_respect_scores <- (mean_respect_scores / max_score) * 100
+percent_sd_respect_scores <- (sd_respect_scores / max_score) * 100
+
+
+
+openness_scores <- openess.sharing.df %>% 
+  mutate(total_score = rowSums(across(everything()), na.rm = TRUE))
+
+openness_scores %>% 
+  ggplot(.,aes(x = total_score)) +
+  geom_bar(width = 2,fill = "blue") +
+  scale_x_continuous(limits = c(32,44),
+                     breaks = seq(32,44,2))
+
+# Calculate mean and SD
+mean_openness_scores <- mean(openness_scores$total_score)
+sd_openness_scores <- sd(openness_scores$total_score)
+
+
+# Convert to percentage
+percent_mean_openness_scores <- (mean_openness_scores / max_score) * 100
+percent_sd_openness_scores <- (sd_openness_scores / max_score) * 100
