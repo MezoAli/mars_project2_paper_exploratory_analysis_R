@@ -102,8 +102,10 @@ plot_barplot_fn(`Salary category in AED`)
 
 
 
-fa.results <- fa(data_numeric,nfactors = 2)
-fa.diagram(fa.results)
+fa.results.1<- fa(data_numeric,nfactors = 2,rotate = "promax",fm = "ml")
+fa.results.2 <- fa(data_numeric,nfactors = 2,rotate = "varimax",fm = "ml")
+fa.diagram(fa.results.1)
+fa.diagram(fa.results.2)
 fa.results$e.values
 scree(data_numeric)
 fa.parallel(data_numeric, fa = "fa", n.iter = 100)
@@ -202,21 +204,44 @@ plot_barplot_fn(`Feeling understood after nurse and physician interaction?`)
 plot_barplot_fn(`Feeling pleased after nurse physician interaction?`)
 
 
-respect_scores <- respect.satisfaction.df %>% 
-  mutate(total_score = rowSums(across(everything()), na.rm = TRUE))
+# Max possible score
+max_score <- 9 * 5  # 9 questions, max 5 points each = 45
+# Min possible score
+min_score <- 9 * 1  # 9 questions, max 5 points each = 9
 
-respect_scores %>% 
+respect_scores <- respect.satisfaction.df %>% 
+  mutate(total_score = rowSums(across(everything()), na.rm = TRUE),
+         sm_score = round((total_score - min_score) / (max_score - min_score) * 100,0))
+
+fig1 <- respect_scores %>% 
   ggplot(.,aes(x = total_score)) +
-  geom_bar(width = 2,fill = "blue") +
-  scale_x_continuous(limits = c(32,44),
-                     breaks = seq(32,44,2))
+  geom_histogram(aes(y = ..density..), binwidth = 1.5, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(32,45),
+                     breaks = seq(32,45,2)) +
+  labs(x = "Respect and Satisfaction sum score",
+       y = "Density",
+       title = "Fig.1 Respect and Satisfaction sub scale items sum score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
+
+
+fig2 <- respect_scores %>% 
+  ggplot(.,aes(x = sm_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = 4, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(60,95),
+                     breaks = seq(60,95,5)) +
+  labs(x = "Respect and Satisfaction percentage",
+       y = "Density",
+       title = "Fig.2 Respect and Satisfaction %SM score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
 
 # Calculate mean and SD
 mean_respect_scores <- mean(respect_scores$total_score)
 sd_respect_scores <- sd(respect_scores$total_score)
 
-# Max possible score
-max_score <- 9 * 5  # 9 questions, max 5 points each = 45
 
 # Convert to percentage
 percent_mean_respect_scores <- (mean_respect_scores / max_score) * 100
@@ -225,7 +250,8 @@ percent_sd_respect_scores <- (sd_respect_scores / max_score) * 100
 
 
 openness_scores <- openess.sharing.df %>% 
-  mutate(total_score = rowSums(across(everything()), na.rm = TRUE))
+  mutate(total_score = rowSums(across(everything()), na.rm = TRUE),
+         sm_score = round((total_score - min_score) / (max_score - min_score) * 100,0))
 
 openness_scores %>% 
   ggplot(.,aes(x = total_score)) +
