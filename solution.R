@@ -253,11 +253,27 @@ openness_scores <- openess.sharing.df %>%
   mutate(total_score = rowSums(across(everything()), na.rm = TRUE),
          sm_score = round((total_score - min_score) / (max_score - min_score) * 100,0))
 
-openness_scores %>% 
+fig3 <- openness_scores %>% 
   ggplot(.,aes(x = total_score)) +
-  geom_bar(width = 2,fill = "blue") +
-  scale_x_continuous(limits = c(32,44),
-                     breaks = seq(32,44,2))
+  geom_histogram(aes(y = ..density..), binwidth = 1.5, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(36,45),
+                     breaks = seq(36,45,2)) +
+  labs(x = "Openness and Sharing sum score",
+       y = "Density",
+       title = "Fig.3 Openness and Sharing on Information sub scale items sum score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
+fig4 <- openness_scores %>% 
+  ggplot(.,aes(x = sm_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = 2, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(70,95),
+                     breaks = seq(70,95,5)) +
+  labs(x = "Openness and Sharing Percentage",
+       y = "Density",
+       title = "Fig.4 Openness and Sharing on Information  %SM score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
 
 # Calculate mean and SD
 mean_openness_scores <- mean(openness_scores$total_score)
