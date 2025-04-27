@@ -383,4 +383,47 @@ fig6 <- attitude_scores %>%
   theme(plot.title = element_text(face = "bold",hjust = 0.5))
 
 
+# organizational factors
+
+max.organization.score <- 5 * 5
+min.organization.score <- 5 * 1
+organization_scores <- data_numeric %>% 
+  select(c(28,29,30,31,32)) %>% 
+  mutate(total_score = rowSums(across(everything()), na.rm = TRUE),
+         sm_score = round((total_score - min.organization.score) / (max.organization.score - min.organization.score) * 100,0))
+
+fig7 <- organization_scores %>% 
+  ggplot(.,aes(x = total_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = 1.5, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(2,14),
+                     breaks = seq(2,14,1)) +
+  labs(x = "Organizational Factors sum score",
+       y = "Density",
+       title = "Fig.7 Organizational Factors sub scale items sum score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
+
+fig8 <- organization_scores %>% 
+  ggplot(.,aes(x = sm_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = 6, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(0,40),
+                     breaks = seq(0,40,5)) +
+  labs(x = "Organizational Factors Percentage",
+       y = "Density",
+       title = "Fig.6 Organizational Factors %SM score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
+
+
+# personal behavior
+
+max.behavior.score <- 3 * 5
+min.behavior.score <- 3 * 1
+behavior_scores <- data_numeric %>% 
+  select(c(25,26,27)) %>% 
+  mutate(total_score = rowSums(across(everything()), na.rm = TRUE),
+         sm_score = round((total_score - min.behavior.score) / (max.behavior.score - min.behavior.score) * 100,0))
+
 
