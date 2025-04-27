@@ -12,6 +12,7 @@ library(likert)
 library(janitor)
 library(ggfortify)
 library(broom)
+library(car)
 data<- read_csv("./data.csv")
 names(data)
 
@@ -321,6 +322,8 @@ autoplot(respect.regression,which = 1:3,nrow = 3,ncol=1)
 tidy(respect.regression)
 glance(respect.regression)
 broom::augment(respect.regression)
+vif(respect.regression)
+alias(respect.regression)
 
 
 openness.regression <- lm(openness_percent ~ professional_category + working_hospital + sex
@@ -332,21 +335,52 @@ autoplot(openness.regression,which = 1:3,nrow = 3,ncol=1)
 tidy(openness.regression,conf.int = T)
 glance(openness.regression)
 broom::augment(openness.regression)
+vif(openness.regression)
 
 
 
 
 
+# rest of domins
+pca.results1 <- data_numeric %>% 
+  select(19:ncol(data_numeric)) %>% 
+  prcomp(.,scale. = T)
+
+pca.results1
+pca.results1.var <- pca.results1$sdev^2
+pca.results1.var.per <- round(pca.results1.var/sum(pca.results1.var) * 100,1)
+barplot(pca.results1.var.per)
+
+# work attitude
+max.attitude.score <- 6 * 5
+min.attiude.score <- 6 * 1
+attitude_scores <- data_numeric %>% 
+  select(19:24) %>% 
+  mutate(total_score = rowSums(across(everything()), na.rm = TRUE),
+         sm_score = round((total_score - min.attiude.score) / (max.attitude.score - min.attiude.score) * 100,0))
 
 
+fig5 <- attitude_scores %>% 
+  ggplot(.,aes(x = total_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = 1.5, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(6,22),
+                     breaks = seq(6,22,2)) +
+  labs(x = "Work Attitude Factors sum score",
+       y = "Density",
+       title = "Fig.5 Work Attitude Factors sub scale items sum score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
 
-
-
-
-
-
-
-
+fig6 <- attitude_scores %>% 
+  ggplot(.,aes(x = sm_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = 8, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(0,65),
+                     breaks = seq(0,65,5)) +
+  labs(x = "Work Attitude Percentage",
+       y = "Density",
+       title = "Fig.6 Work Attitude Factors %SM score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
 
 
 
