@@ -396,8 +396,8 @@ fig7 <- organization_scores %>%
   ggplot(.,aes(x = total_score)) +
   geom_histogram(aes(y = ..density..), binwidth = 1.5, fill = "skyblue", color = "black") +
   geom_density(color = "blue", size = 1,linetype = "dotted") +
-  scale_x_continuous(limits = c(2,14),
-                     breaks = seq(2,14,1)) +
+  scale_x_continuous(limits = c(4,14),
+                     breaks = seq(4,14,1)) +
   labs(x = "Organizational Factors sum score",
        y = "Density",
        title = "Fig.7 Organizational Factors sub scale items sum score") +
@@ -425,5 +425,31 @@ behavior_scores <- data_numeric %>%
   select(c(25,26,27)) %>% 
   mutate(total_score = rowSums(across(everything()), na.rm = TRUE),
          sm_score = round((total_score - min.behavior.score) / (max.behavior.score - min.behavior.score) * 100,0))
+
+
+fig9 <- behavior_scores %>% 
+  ggplot(.,aes(x = total_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = .75, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(2,6),
+                     breaks = seq(2,6,0.5)) +
+  labs(x = "Personal Behavior Factors sum score",
+       y = "Density",
+       title = "Fig.9 Personal Behavior Factors sub scale items sum score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
+
+
+fig10 <- behavior_scores %>% 
+  ggplot(.,aes(x = sm_score)) +
+  geom_histogram(aes(y = ..density..), binwidth = 3, fill = "skyblue", color = "black") +
+  geom_density(color = "blue", size = 1,linetype = "dotted") +
+  scale_x_continuous(limits = c(-2,20),
+                     breaks = seq(-2,20,2)) +
+  labs(x = "Personal Behavior Percentage",
+       y = "Density",
+       title = "Fig.9 Personal Behavior Factors  %SM score") +
+  theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
 
 
