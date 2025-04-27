@@ -474,4 +474,29 @@ broom::augment(attitude.regression)
 alias(attitude.regression)
 
 
+organization.regression <- lm(organization_percent ~ professional_category + working_hospital + sex
+                          + age_in_years + marital_status + last_educational_qualification +
+                            professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
+                            service_in_years + working_unit_category + race,data = regression.df.domin2) 
+summary(organization.regression)
+vif(organization.regression)
+autoplot(organization.regression,which = 1:3,nrow = 3,ncol=1)
+tidy(organization.regression)
+glance(organization.regression)
+broom::augment(organization.regression)
+alias(organization.regression)
+
+
+behavior.regression <- lm(behavior_percent ~ professional_category + working_hospital + sex
+                              + age_in_years + marital_status + last_educational_qualification +
+                                professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
+                                service_in_years + working_unit_category + race,data = regression.df.domin2) 
+summary(behavior.regression)
+vif(behavior.regression)
+autoplot(behavior.regression,which = 1:3,nrow = 3,ncol=1)
+tidy(behavior.regression)
+glance(behavior.regression)
+broom::augment(behavior.regression)
+alias(behavior.regression)
+
 
