@@ -9,7 +9,9 @@ library(gtsummary)
 library(cardx)
 library(corrplot)
 library(likert)
-
+library(janitor)
+library(ggfortify)
+library(broom)
 data<- read_csv("./data.csv")
 names(data)
 
@@ -283,3 +285,68 @@ sd_openness_scores <- sd(openness_scores$total_score)
 # Convert to percentage
 percent_mean_openness_scores <- (mean_openness_scores / max_score) * 100
 percent_sd_openness_scores <- (sd_openness_scores / max_score) * 100
+
+#PCA
+
+communication.df <- data_numeric %>% 
+  select(1:18)
+
+pca.communication <- prcomp(communication.df,scale. = TRUE)
+summary(pca.communication)
+plot(pca.communication$x[,1],pca.communication$x[,2])
+pca.communication$rotation[,1:2]
+pca.communication$x[,1:2]
+pca.communication.var <- pca.communication$sdev^2
+pca.communication.var.per <- round(pca.communication.var/sum(pca.communication.var) * 100,1)
+barplot(pca.communication.var.per)
+
+
+# regression and hypothesis testing
+regression.df <- data %>% 
+  select(1:12) %>%
+  clean_names(.) %>% 
+  add_column(respect_score = respect_scores$total_score,
+             respect_percent = respect_scores$sm_score,
+             openness_score = openness_scores$total_score,
+             openness_percent = openness_scores$sm_score)
+
+names(regression.df)
+
+respect.regression <- lm(respect_percent ~ professional_category + working_hospital + sex
+                         + age_in_years + marital_status + last_educational_qualification +
+                           professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
+                           service_in_years + working_unit_category + race,data = regression.df) 
+summary(respect.regression)
+autoplot(respect.regression,which = 1:3,nrow = 3,ncol=1)
+tidy(respect.regression)
+glance(respect.regression)
+broom::augment(respect.regression)
+
+
+openness.regression <- lm(openness_percent ~ professional_category + working_hospital + sex
+                         + age_in_years + marital_status + last_educational_qualification +
+                           professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
+                           service_in_years + working_unit_category + race,data = regression.df) 
+summary(openness.regression)
+autoplot(openness.regression,which = 1:3,nrow = 3,ncol=1)
+tidy(openness.regression,conf.int = T)
+glance(openness.regression)
+broom::augment(openness.regression)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
