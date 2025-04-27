@@ -303,20 +303,18 @@ barplot(pca.communication.var.per)
 
 
 # regression and hypothesis testing
-regression.df <- data %>% 
+regression.df.domin1 <- data %>% 
   select(1:12) %>%
   clean_names(.) %>% 
-  add_column(respect_score = respect_scores$total_score,
-             respect_percent = respect_scores$sm_score,
-             openness_score = openness_scores$total_score,
+  add_column(respect_percent = respect_scores$sm_score,
              openness_percent = openness_scores$sm_score)
 
-names(regression.df)
+names(regression.df.domin1)
 
 respect.regression <- lm(respect_percent ~ professional_category + working_hospital + sex
                          + age_in_years + marital_status + last_educational_qualification +
                            professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
-                           service_in_years + working_unit_category + race,data = regression.df) 
+                           service_in_years + working_unit_category + race,data = regression.df.domin1) 
 summary(respect.regression)
 autoplot(respect.regression,which = 1:3,nrow = 3,ncol=1)
 tidy(respect.regression)
@@ -329,7 +327,7 @@ alias(respect.regression)
 openness.regression <- lm(openness_percent ~ professional_category + working_hospital + sex
                          + age_in_years + marital_status + last_educational_qualification +
                            professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
-                           service_in_years + working_unit_category + race,data = regression.df) 
+                           service_in_years + working_unit_category + race,data = regression.df.domin1) 
 summary(openness.regression)
 autoplot(openness.regression,which = 1:3,nrow = 3,ncol=1)
 tidy(openness.regression,conf.int = T)
@@ -450,6 +448,30 @@ fig10 <- behavior_scores %>%
        y = "Density",
        title = "Fig.9 Personal Behavior Factors  %SM score") +
   theme(plot.title = element_text(face = "bold",hjust = 0.5))
+
+
+
+# regression
+
+regression.df.domin2 <- data %>% 
+  select(1:12) %>%
+  clean_names(.) %>% 
+  add_column(attitude_percent = attitude_scores$sm_score,
+             organization_percent = organization_scores$sm_score,
+             behavior_percent = behavior_scores$sm_score
+             )
+
+attitude.regression <- lm(attitude_percent ~ professional_category + working_hospital + sex
+                         + age_in_years + marital_status + last_educational_qualification +
+                           professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
+                           service_in_years + working_unit_category + race,data = regression.df.domin2) 
+summary(attitude.regression)
+vif(attitude.regression)
+autoplot(attitude.regression,which = 1:3,nrow = 3,ncol=1)
+tidy(attitude.regression)
+glance(attitude.regression)
+broom::augment(attitude.regression)
+alias(attitude.regression)
 
 
 
