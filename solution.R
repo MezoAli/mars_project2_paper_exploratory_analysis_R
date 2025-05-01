@@ -1,21 +1,44 @@
 rm(list = ls())
 graphics.off()
 
-install.packages("likert")
+
+# for running data manipulation
+install.packages("tidyverse")
+# for running the factor analysis and crohbach alpha tests
+install.packages("psych")
+#for creating publication ready tables
+install.packages("gtsummary")
+# helper package for gtsummary to do the hypothesis testing
+install.packages("cardx")
+# show correlation matrix plot
+install.packages("corrplot")
+# used to show regression assumptions plot to validate the model
+install.packages("ggfortify")
+# used to show regression coefficients in tidy form
+install.packages("broom")
+# used vif function to detect multicollinerity
+install.packages("car")
+# used to plot the PCA loadings, scores and and PCAs
+install.packages("factoextra")
+
 
 library(tidyverse)
 library(psych)
 library(gtsummary)
 library(cardx)
 library(corrplot)
-library(likert)
-library(janitor)
 library(ggfortify)
 library(broom)
 library(car)
-data<- read_csv("./data.csv")
-names(data)
+library(factoextra)
 
+
+
+# read the data
+data <- read_csv("./data.csv")
+
+# helper function to recode the levels of all factors to get consistant levels accross
+# all variables
 recode_scale <- function(x) {
   case_when(
     x == "always" ~ 5,
@@ -27,6 +50,11 @@ recode_scale <- function(x) {
   )
 }
 
+# convert `service in years` into numeric values and replace NAs with 0
+# convert all observations into lower case to avoid typos
+# col`40` has a typo regarding rarely level so modify it
+# convert needed variables into factors
+# omit the observations that contain NA ( acc. to dr. Amira instractions)
 data <- data %>% 
   mutate(`Service  (in years)` = as.numeric(`Service  (in years)`)) %>% 
   replace_na(list(`Service  (in years)` = 0)) %>%
@@ -38,24 +66,33 @@ data <- data %>%
 
 summary(data)
 
+
+# recode the selected coulmns to have consistant factors levels
+# convert them into numeric values for further analysis
 data_numeric <- data %>%
   select(13:44) %>%
   mutate(across(everything(), recode_scale)) %>%
   mutate(across(everything(), as.integer))
 
 
-
+# re-name the variables names like the guidence files
 names(data_numeric) <- c("angry","frustrated","understood","respected","pleased","satisfied","equal","talking",
                          "correct","change_ttt","pat_saftey","pat_care","schedule","exch_info","tired","help",
                          "listen","corr_info","non_compliance","Negligence","abuse","poor_att","uncooperative","gender_diff",
                          "unfavor_att","poor_commun","disruptive","differential_ttt","absc_forum","shar_vision","malfunctioning","suppl_short")
 
+# create correlation matrix between all variables
 cor.matrix = cor(data_numeric,use = "pairwise.complete.obs")
 
+# show correlation matrix as a plot to detect relation reasily
 cor.matrix.plot <- corrplot(cor.matrix,method = "square", type = "lower", tl.cex = 0.6)
 
-which(abs(cor.matrix) > 0.7 & abs(cor.matrix) < 1, arr.ind = TRUE)
+# to show variables that shows strong relation between others
+# results shows weak or moderate relations between variables and none shows 
+# strong correlations
+which(abs(cor.matrix) >= 0.7 & abs(cor.matrix) < 1, arr.ind = TRUE)
 
+## Factor Analysis
 
 
 KMO.result <- KMO(data_numeric)
@@ -293,13 +330,16 @@ communication.df <- data_numeric %>%
   select(1:18)
 
 pca.communication <- prcomp(communication.df,scale. = TRUE)
+fviz_eig(pca.communication, addlabels = TRUE)
+fviz_pca_biplot(pca.communication)
+fviz_pca_var(pca.communication)
 summary(pca.communication)
 plot(pca.communication$x[,1],pca.communication$x[,2])
 pca.communication$rotation[,1:2]
 pca.communication$x[,1:2]
-pca.communication.var <- pca.communication$sdev^2
-pca.communication.var.per <- round(pca.communication.var/sum(pca.communication.var) * 100,1)
-barplot(pca.communication.var.per)
+#pca.communication.var <- pca.communication$sdev^2
+#pca.communication.var.per <- round(pca.communication.var/sum(pca.communication.var) * 100,1)
+#barplot(pca.communication.var.per)
 
 
 # regression and hypothesis testing
