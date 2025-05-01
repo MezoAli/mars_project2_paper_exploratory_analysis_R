@@ -50,6 +50,19 @@ recode_scale <- function(x) {
   )
 }
 
+# helper function to plot the counts for each level inside single variable
+# takes the var name as in the original dataset
+# i will use the names(df) function to get the name of each original var before running
+plot_barplot_fn <- function(var){
+  require(tidyverse)
+  var <- rlang::enquo(var)
+  ggplot(data,aes(x = !!var,fill = !!var)) +
+    geom_bar() +
+    theme(axis.text.x = element_text(angle = 90,margin = margin(t=5),size = 8),
+          plot.title = element_text(face = "bold",hjust = .5)) +
+    ggtitle(paste("Participants",rlang::as_label(var),sep = " "))
+}
+
 # convert `service in years` into numeric values and replace NAs with 0
 # convert all observations into lower case to avoid typos
 # col`40` has a typo regarding rarely level so modify it
@@ -94,14 +107,19 @@ which(abs(cor.matrix) >= 0.7 & abs(cor.matrix) < 1, arr.ind = TRUE)
 
 ## Factor Analysis
 
-
+# used to test sample adequency, however the overall = .19 which is very low
+# recommended shreshold is like above 0.5 or 0.6
 KMO.result <- KMO(data_numeric)
 
+# sort the individual variables scores according to MSA
 sort(KMO.result$MSAi,decreasing = TRUE)
 
+# used to test the if the correlation matrix is an identity matrix(vars are uncorrelated)
+# results : significant p-value so we reject the H0 and vaiables are correlated
 cortest.bartlett(data_numeric)
 
 
+# create demographic data tables
 tb1 <- data %>% 
   select(1:12) %>% 
   tbl_summary() %>% 
@@ -109,36 +127,26 @@ tb1 <- data %>%
   modify_caption("**Demographic Data**")
 tb1
 
+# create demographic data tables and test if there is significant
+# difference between the professional category
 tb2 <- data %>% 
   select(1:12) %>% 
-  tbl_summary(by = professional_category) %>% 
+  tbl_summary(by = `Professional category`) %>% 
   bold_labels() %>% 
   modify_caption("**Table 1. Participants' Characteristics By Profession (n = 37)**") %>% 
   add_p() %>% 
   bold_p()
 tb2
 
-
-
-
-
-
-plot_barplot_fn <- function(var){
-  require(tidyverse)
-  var <- rlang::enquo(var)
-  ggplot(data,aes(x = !!var,fill = !!var)) +
-    geom_bar() +
-    theme(axis.text.x = element_text(angle = 90,margin = margin(t=5),size = 8),
-          plot.title = element_text(face = "bold",hjust = .5)) +
-    ggtitle(paste("Participants",rlang::as_label(var),sep = " "))
-}
-
-
+# to get the names of variables we need to plot
+names(data[,1:12])
+# plot the demographic data levels counts
 plot_barplot_fn(Race)
 plot_barplot_fn(`Professional category`)
 plot_barplot_fn(`Age in years`)
 plot_barplot_fn(`Working unit category`)
 plot_barplot_fn(`Salary category in AED`)
+plot_barplot_fn(`Position presently hold in the hospital`)
 
 
 
