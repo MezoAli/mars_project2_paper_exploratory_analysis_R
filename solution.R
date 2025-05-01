@@ -176,21 +176,26 @@ plot_barplot_fn(`Salary category in AED`)
 plot_barplot_fn(`Position presently hold in the hospital`)
 
 
-# running factor analysis 
-# fa.results.1<- fa(data_numeric,nfactors = 2,rotate = "promax",fm = "ml")
-# fa.results.2 <- fa(data_numeric,nfactors = 2,rotate = "varimax",fm = "ml")
-# fa.diagram(fa.results.1)
-# fa.diagram(fa.results.2)
-# fa.results.1$e.values
-# fa.results.2$e.values
-# scree(data_numeric)
+# running factor analysis
+fa.results.1<- fa(data_numeric,nfactors = 2,rotate = "promax",fm = "ml")
+fa.results.2 <- fa(data_numeric,nfactors = 2,rotate = "varimax",fm = "ml")
+fa.diagram(fa.results.1)
+fa.diagram(fa.results.2)
+fa.results.1$e.values
+fa.results.2$e.values
+scree(data_numeric)
+
 # fa.parallel(data_numeric, fa = "fa", n.iter = 100)
 # according to fa.results and fa.diagram, some questions need to be dropped due to
 # very low loadings ( less than 0.3) and/or very high uniqueness (near to 1)
 # and these questions are 8,13,14,16,19,22,25,27,28,31 but i will continue with
 # the same questions according to instructor 
 
-
+# as results of factor analysis, the sample size is relatively small, 2 factors
+# were good and bartlett was significant, however maybe becouse the data is simplated
+# the questions are associated with different arrangment of factors not like in the
+# guidence file, some variables were better to be dropped due to very low loading and very high
+# uniquness but acc. to instructor we don't remove anythign the work on the data as it is
 
 #-------------------- respect and satisfaction ------------------ START
 respect.satisfaction.df <- data_numeric %>% 
