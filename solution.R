@@ -499,26 +499,58 @@ fig10 <- behavior_scores %>%
 
 #-------------------- All Domins Figures ------------------ END
 
+# ------------------PCA for communication data frame------------------START
 
-#PCA
+# select both respect and openness questions
 
-communication.df <- data_numeric %>% 
+factor.1.df <- data_numeric %>% 
   select(1:18)
 
-pca.communication <- prcomp(communication.df,scale. = TRUE)
-fviz_eig(pca.communication, addlabels = TRUE)
-fviz_pca_biplot(pca.communication)
-fviz_pca_var(pca.communication)
-summary(pca.communication)
-plot(pca.communication$x[,1],pca.communication$x[,2])
-pca.communication$rotation[,1:2]
-pca.communication$x[,1:2]
-#pca.communication.var <- pca.communication$sdev^2
-#pca.communication.var.per <- round(pca.communication.var/sum(pca.communication.var) * 100,1)
-#barplot(pca.communication.var.per)
+pca.factor.1 <- prcomp(factor.1.df,scale. = TRUE)
+# plot for PCAs that explain variance
+fviz_eig(pca.factor.1, addlabels = TRUE)
+# plot for both variables(arrows) and observations (dots)
+fviz_pca_biplot(pca.factor.1)
+# plot for loadings only (variables)
+fviz_pca_var(pca.factor.1)
+# plot for the scores (observations )
+fviz_pca_ind(pca.factor.1)
+
+summary(pca.factor.1)
+# to look for clusters
+plot(pca.factor.1$x[,1],pca.factor.1$x[,2])
 
 
-# regression and hypothesis testing
+
+pca.factor.2 <- data_numeric %>% 
+  select(19:ncol(data_numeric)) %>% 
+  prcomp(.,scale. = T)
+
+# plot for PCAs that explain variance
+fviz_eig(pca.factor.2, addlabels = TRUE)
+# plot for both variables(arrows) and observations (dots)
+fviz_pca_biplot(pca.factor.2)
+# plot for loadings only (variables)
+fviz_pca_var(pca.factor.2)
+# plot for the scores (observations )
+fviz_pca_ind(pca.factor.2)
+# looked for cumulative proportions that explain variances
+summary(pca.factor.2)
+# to look for clusters
+plot(pca.factor.2$x[,1],pca.factor.2$x[,2])
+
+
+# as shown in both pca, there is no main principal component is responsible for
+# the majority of the variance in the dataset which suggest highly multidimensional structure
+# where variance is distributed relatively evenly across many components making using
+# PCA is not the optimal solution for this dataset
+
+# ------------------ PCA for communication data frame------------------END 
+
+
+# ------------------ regression and hypothesis testing ------------------START 
+
+# i used the percent as it is easier in interpretion than sum scores
 regression.df.domin1 <- data %>% 
   select(1:12) %>%
   clean_names(.) %>% 
@@ -531,38 +563,41 @@ respect.regression <- lm(respect_percent ~ professional_category + working_hospi
                          + age_in_years + marital_status + last_educational_qualification +
                            professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
                            service_in_years + working_unit_category + race,data = regression.df.domin1) 
+# to get the coeffs of the variables
 summary(respect.regression)
+# to show model assumptions like residulas vs fitted values and Q-Q plot
 autoplot(respect.regression,which = 1:3,nrow = 3,ncol=1)
-tidy(respect.regression)
+# to present the coeffs in tidy format showing confidence interval
+tidy(respect.regression,conf.int = TRUE)
+# to show model overall coeffs
 glance(respect.regression)
-broom::augment(respect.regression)
+# to check for multicollinerity
 vif(respect.regression)
+# used becouse vif throw an error due to perfect colinerity of some levels
 alias(respect.regression)
 
+# this model has a lot of drops like high r^2 but low adjusted r^2 which is due to too many
+# independent variables with low observations which lead to overfitting, also assumptions are
+# not met especially normal distribution of residuals, also almost no predictor has significant
+# p-value plus presence of perfect multicollinerity between some variables
+# really want to adjust but have no this 
 
 openness.regression <- lm(openness_percent ~ professional_category + working_hospital + sex
                           + age_in_years + marital_status + last_educational_qualification +
-                            professional_training + salary_category_in_aed + position_presently_hold_in_the_hospital +
-                            service_in_years + working_unit_category + race,data = regression.df.domin1) 
+                            professional_training + position_presently_hold_in_the_hospital +
+                            service_in_years + working_unit_category,data = regression.df.domin1) 
 summary(openness.regression)
 autoplot(openness.regression,which = 1:3,nrow = 3,ncol=1)
 tidy(openness.regression,conf.int = T)
 glance(openness.regression)
-broom::augment(openness.regression)
 vif(openness.regression)
+alias(openness.regression)
 
+# this model also has a lot of drops like assumptions are not met especially normal 
+# distribution of residuals, also almost no predictor has significant
+# p-value (except for marital status and service in years) plus presence
+# of perfect multicollinerity between some variables
 
-pca.results1 <- data_numeric %>% 
-  select(19:ncol(data_numeric)) %>% 
-  prcomp(.,scale. = T)
-
-pca.results1
-pca.results1.var <- pca.results1$sdev^2
-pca.results1.var.per <- round(pca.results1.var/sum(pca.results1.var) * 100,1)
-barplot(pca.results1.var.per)
-
-
-# regression
 
 regression.df.domin2 <- data %>% 
   select(1:12) %>%
@@ -579,10 +614,17 @@ attitude.regression <- lm(attitude_percent ~ professional_category + working_hos
 summary(attitude.regression)
 vif(attitude.regression)
 autoplot(attitude.regression,which = 1:3,nrow = 3,ncol=1)
-tidy(attitude.regression)
+tidy(attitude.regression,conf.int = T)
 glance(attitude.regression)
-broom::augment(attitude.regression)
-alias(attitude.regression)
+
+# actually this was relatively good model except for the assumptions of residuals don't
+# have mean of 0 accross fitted values 
+# Being a Physician (β = -42.17, p = 0.0037), which was associated with a substantially lower attitude score.
+# Working in a Teaching/Referral Hospital (β = 15.43, p = 0.009), which was linked to higher attitude scores.
+# Male gender (β = 12.88, p = 0.049), which was associated with a higher score.
+# Age group 40–45 (β = 26.21, p = 0.0377).
+# Holding a Master’s, PhD, or Postgraduate Diploma was negatively associated with attitude scores (e.g., Master’s β = -39.35, p = 0.019).
+# Training in Arab countries (β = 37.30, p = 0.0162) and India (β = 43.05, p = 0.004) were positively associated.
 
 
 organization.regression <- lm(organization_percent ~ professional_category + working_hospital + sex
@@ -597,6 +639,13 @@ glance(organization.regression)
 broom::augment(organization.regression)
 alias(organization.regression)
 
+# this model has a lot of drops like high r^2 but low adjusted r^2 which is due to too many
+# independent variables with low observations which lead to overfitting, also assumptions are
+# not met especially normal distribution of residuals, also almost no predictor has significant
+# p-value plus presence of perfect multicollinerity between some variables
+
+
+
 
 behavior.regression <- lm(behavior_percent ~ professional_category + working_hospital + sex
                               + age_in_years + marital_status + last_educational_qualification +
@@ -610,4 +659,10 @@ glance(behavior.regression)
 broom::augment(behavior.regression)
 alias(behavior.regression)
 
+# this model has a lot of drops like high r^2 but low adjusted r^2 which is due to too many
+# independent variables with low observations which lead to overfitting, also assumptions are
+# not met especially normal distribution of residuals, also almost no predictor has significant
+# p-value plus presence of perfect multicollinerity between some variables
 
+
+# ------------------ regression and hypothesis testing ------------------END 
